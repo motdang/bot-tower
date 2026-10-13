@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+	<key>Label</key>
+	<string>haus.bottower.tick</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/python3</string>
+		<string>/Users/annikapeacock/Developer/claude code projects/bot-tower/tower.py</string>
+		<string>due</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/tmp/bottower-tick.log</string>
+	<key>StandardOutPath</key>
+	<string>/tmp/bottower-tick.log</string>
+	<key>StartInterval</key>
+	<integer>300</integer>
+</dict>
+</plist>

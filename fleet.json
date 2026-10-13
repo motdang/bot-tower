@@ -1,0 +1,199 @@
+{
+  "lanes": {
+    "web.archive.org": {
+      "gap_minutes": 45,
+      "note": "Wayback SPN rate-limits per account. Shared by wichaa-archive-drip and defiant-wayback."
+    },
+    "github-push": {
+      "gap_minutes": 5,
+      "note": "All pushes go out as NaNoBotCo. One at a time, small breathing room between. The lane sat unused from 2026-08-07, when the account was flagged and every publisher was rerouted to cloudflare-deploy; the flag was lifted 2026-09-08 and git-push-walk carries the lane again from 2026-09-16."
+    },
+    "cloudflare-deploy": {
+      "gap_minutes": 5,
+      "note": "Wrangler deploys to Cloudflare Pages/Workers. One at a time: a wichaa refresh uploads ~30k files over ~25 minutes, and two overlapping deploys would fight over the staging dir in TMPDIR."
+    },
+    "catalog.db": {
+      "gap_minutes": 0,
+      "note": "The manuscript crawler writes this while the wiki publish reads it. Exclusive lane."
+    },
+    "dlntm": {
+      "gap_minutes": 0,
+      "note": "Manuscript source site. Be a polite guest."
+    },
+    "passport-hd": {
+      "gap_minutes": 0,
+      "note": "External image store on /Volumes/Passport5TB. Must be mounted."
+    }
+  },
+  "bots": {
+    "deadman-check": {
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/annikapeacock/Developer/claude code projects/dead-mans-switch/deadman.py",
+        "--check"
+      ],
+      "lanes": [],
+      "schedule": {
+        "every_minutes": 60
+      },
+      "note": "Hourly wellness check. No shared lanes; listed so the timetable shows the whole fleet."
+    },
+    "lanna-crawler": {
+      "command": [
+        "/bin/bash",
+        "/Users/annikapeacock/Developer/claude code projects/manuscript-crawler/forever.sh"
+      ],
+      "lanes": [
+        "dlntm",
+        "catalog.db",
+        "passport-hd"
+      ],
+      "schedule": {
+        "resident": true
+      },
+      "note": "Always-on (launchd KeepAlive). Its crawl steps run outside the tower, but its publish step (8/8) takes the cloudflare-deploy + catalog.db lanes via tower wrap (github-push until 2026-08-12)."
+    },
+    "lannawiki-publish": {
+      "command": [
+        "/bin/bash",
+        "/Users/annikapeacock/Library/Application Support/wichaa/nightly-publish.sh"
+      ],
+      "lanes": [
+        "catalog.db",
+        "cloudflare-deploy"
+      ],
+      "schedule": {
+        "at": [
+          "03:00"
+        ]
+      },
+      "note": "Nightly wiki build + deploy to Cloudflare Pages (wichaa + wichaa-m). Was github-push until 2026-08-12; the account suspension made that lane a dead end and the held lane stalled this job for five nights."
+    },
+    "wichaa-archive-drip": {
+      "command": [
+        "/bin/bash",
+        "/Users/annikapeacock/Developer/claude code projects/manuscript-crawler/archive_drip.sh"
+      ],
+      "lanes": [
+        "web.archive.org"
+      ],
+      "schedule": {
+        "every_minutes": 180
+      },
+      "note": "Wayback tiering drip, every 3 hours."
+    },
+    "defiant-nightly": {
+      "command": [
+        "/bin/zsh",
+        "/Users/annikapeacock/Developer/claude code projects/defiant-site/nightly.sh"
+      ],
+      "lanes": [],
+      "schedule": {
+        "at": [
+          "03:30"
+        ]
+      },
+      "note": "Defiant site nightly build + push. Declares NO lane here on purpose: most of its run is an OSM crawl (23 hubs at up to 180s each) that touches nothing shared, and holding github-push across all of it stalled every other push for half an hour on 2026-08-03. nightly.sh takes the lane around its `git push` line instead — the narrow hold is the right one."
+    },
+    "defiant-wayback": {
+      "command": [
+        "/usr/bin/python3",
+        "/Users/annikapeacock/Developer/claude code projects/defiant-site/archive_defiant.py",
+        "--skip-recent",
+        "6"
+      ],
+      "lanes": [
+        "web.archive.org"
+      ],
+      "schedule": {
+        "at": [
+          "04:15"
+        ]
+      },
+      "note": "Defiant Wayback snapshots."
+    },
+    "hodie-ledger": {
+      "command": [],
+      "lanes": [],
+      "schedule": {
+        "at": [
+          "21:09"
+        ]
+      },
+      "note": "Daily portal ledger task — runs as a Claude scheduled task in the cloud, not on this Mac. Listed for the timetable."
+    },
+    "watchdog-switch": {
+      "command": [],
+      "lanes": [],
+      "schedule": {
+        "at": [
+          "08:08"
+        ]
+      },
+      "note": "Daily watchdog — runs as a Claude scheduled task in the cloud. Listed for the timetable."
+    },
+    "motdang-standing-walk": {
+      "command": [
+        "/bin/zsh",
+        "/Users/annikapeacock/Developer/claude code projects/mot-dang/importers/standing_walk.sh"
+      ],
+      "lanes": [
+        "cloudflare-deploy"
+      ],
+      "schedule": {
+        "every_minutes": 20
+      },
+      "note": "เดินเก็บเรื่อย ๆ — the standing walk. Publishes motdang.net perpetually: every 20 min it picks up whatever the maker bots finished and ships it, gated on a content fingerprint so an unchanged site is never rebuilt. Nobody asks whether to publish. Shares /tmp/motdang-walk.lock with the morning walk (which gathers the daily sources ahead of it) and takes cloudflare-deploy via `tower.py wrap --no-wait` at the deploy step. To pause it: mot-dang/cache/walk-rest."
+    },
+    "search-core-sync": {
+      "command": [
+        "/bin/bash",
+        "/Users/annikapeacock/Developer/claude code projects/search-core/rollout.sh"
+      ],
+      "lanes": [],
+      "note": "Regenerates the shared search tables (mine.py), pushes core + tables to every consumer (sync.py), and fails if the Python and JS runtimes disagree (parity.py). Deploys nothing. Exit 3 = refused a partial corpus read: mine.py will not build a smaller dictionary from a half-written build, having once quietly cut Mot Dang's segmentation vocabulary from 7,355 words to 4,109 by reading docs/ mid-rebuild. Safe to re-run any time; harmless if it collides with a build. Rollout queue for unwired sites: search-core/ROLLOUT.md."
+    },
+    "portal-publish": {
+      "command": [
+        "/bin/bash",
+        "/Users/annikapeacock/Developer/claude code projects/cloudflare-mirror/portal_publish.sh"
+      ],
+      "lanes": [
+        "cloudflare-deploy"
+      ],
+      "schedule": {
+        "at": [
+          "04:40"
+        ]
+      },
+      "note": "Publishes nan.wichaa.net — the portal root plus the thairoots and skipdjt trees deploy.sh rsyncs into it. GATED ON CONTENT: portal_fingerprint.py hashes exactly what deploy.sh portal would upload, with generator timestamps dropped from the top level of any JSON, so an unchanged site is never re-uploaded and the log names whatever did change. Stands down silently when nothing moved. 04:40 sits after lannawiki-publish (03:00) and its ~25 min upload, and holds cloudflare-deploy so it can never overlap one. --gate-only to see what it would do; --force to deploy regardless (cache purge, rollback). The stamp is only written after a SUCCESSFUL deploy, so a failure retries rather than recording a publish that never reached the web. This was the fleet's one live site with no publisher: hodie-ledger wrote to the portal twice a day and it reached the web only when someone ran the lane by hand."
+    },
+    "git-push-walk": {
+      "command": [
+        "/usr/bin/python3",
+        "/Users/annikapeacock/Developer/claude code projects/bot-tower/push_walk.py"
+      ],
+      "lanes": [
+        "github-push"
+      ],
+      "schedule": {
+        "every_minutes": 180
+      },
+      "note": "Pushes any repo that already has a remote and is ahead of it. Never adds a remote, so the no-remote local-only set is unreachable from here. Greps every pending diff for case identifiers and refuses that repo on a hit."
+    },
+    "index-nightly": {
+      "command": [
+        "/bin/zsh",
+        "/Users/annikapeacock/Developer/claude code projects/index/nightly.sh"
+      ],
+      "lanes": [],
+      "schedule": {
+        "at": [
+          "04:10"
+        ]
+      },
+      "note": "The index: re-count every source, rebuild docs/, push. Declares no lane; nightly.sh takes github-push around its push line, like defiant-nightly."
+    }
+  },
+  "queue": []
+}

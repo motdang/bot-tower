@@ -1,0 +1,111 @@
+UNCOMMITTED WORK — TRIAGE
+2026-09-16 · 15 repos with changes sitting outside git
+
+
+DONE — committed and pushed, nothing needed from you
+─────────────────────────────────────────────────────────────────
+
+  nanobotco-profile   README: dropped the line listing Annika Peacock /
+                      Annika Schauer / Annika Faulk / Nan Peacock as the
+                      same person, and the note about the suspended
+                      Facebook and Instagram.
+
+  traffic-eye         README + wrangler.collector.toml: the Analytics read
+                      token already exists in the fleet key store. Points
+                      at it instead of walking through minting another.
+
+  dead-mans-switch    deadman.py, +99 lines: polls a remote inbox so a
+                      check-in can arrive from your phone. state.json is
+                      now gitignored — it is runtime state, not source.
+
+  coucal-clock        A real bug: the Thai and Lanna animal-year cycles
+                      were BOTH a year off, and agreed with each other,
+                      so the old tests passed. Now +5 not +4, with a test
+                      pinned to real anchors (2020 rat, 2025 snake, 2026
+                      horse). 16 tests pass.
+
+
+NOT YOURS — dropped from the list
+─────────────────────────────────────────────────────────────────
+
+  heliboard           This is Helium314/HeliBoard. You have 0 commits on
+                      it. The 10 modified files are your own patch set on
+                      someone else's keyboard — you cannot push them, and
+                      commits on a repo you do not own would not reach
+                      your graph anyway. Left alone.
+
+
+BUILD OUTPUT — the big one, and it is a decision, not a cleanup
+─────────────────────────────────────────────────────────────────
+
+  Five repos commit their built site into git. The pending files are not
+  junk; they are an unpublished snapshot.
+
+      nanobotco-lanna   5,347 files under docs/     NO .gitignore
+      mot-dang         15,771 under docs/, +186,057 untracked
+      poplucky             78 under docs/
+      offramp              14 under docs/
+      skipdjt              10 under docs/
+
+  Worth knowing: most of your green this month came from exactly these —
+  the 430 "Refresh Lanna Wiki snapshot" commits are what filled 8/12
+  through today. Committing built output is what has been lighting the
+  graph.
+
+  The fork: Cloudflare/R2 serves every one of your domains, so docs/ in
+  git is a mirror, not the serving path. Keeping it committed is a
+  choice. Two ways:
+
+    a) Keep committing it. The refresh bots go on producing daily
+       commits. Costs repo size; mot-dang's untracked pile is 186k files
+       and would need a hard look before any of it lands.
+
+    b) .gitignore docs/ in these five. Repos get small and readable.
+       The daily snapshot commits stop, and with them a large share of
+       the daily tiles.
+
+  nanobotco-lanna and thairoots have no .gitignore at all, which is why
+  generated files show up as changes in the first place.
+
+
+REAL WORK — wants your eye, not mine
+─────────────────────────────────────────────────────────────────
+
+  wichaa-vault        221 place files under places/, all hand-written
+                      markdown. Also _meta/vocab/place-types.md and 3
+                      scripts. This is content, not output.
+
+  manuscript-wiki     32 source changes including content/entity-kai.md,
+                      entity-katha.md, entity-ma.md, entity-mangrai.md —
+                      article writing. Plus article_pages.py,
+                      build_static.py, cartography.py. 577 untracked,
+                      mostly data/ (459) and publishing/ (87).
+
+  manuscript-crawler  17 source changes: crawler/cli.py, download.py,
+                      search_terms.py, sources/efeo.py, term_scout.py,
+                      forever.sh, BOTS.md, HANDOFF.md. Buried under 271
+                      cache files and 4,674 untracked.
+
+  mueang-map          map.html and wats.html, plus 11 data files.
+
+
+NEVER COMMIT
+─────────────────────────────────────────────────────────────────
+
+  thairoots           "_downloads drop 2026-08-17 (builds + dictionary
+                      dumps)/" — 2,517 files including a complete JDK 21
+                      distribution. This wants a .gitignore, not a
+                      commit. The repo has none. The two real changes
+                      are index.html and sw.js.
+
+
+CREDENTIAL SCAN
+─────────────────────────────────────────────────────────────────
+
+  Clean. 65 filename hits were all place names — "secret pharmacy",
+  "angel's secrets", "grill-token steak house". 15 content hits in
+  mot-dang were Thai URL slugs. The one in manuscript-crawler is
+  forever.sh reading CLOUDFLARE_API_TOKEN out of
+  ~/.config/nanobotco/keys.json at runtime, which is how it should work.
+
+  No case identifiers in any pending diff.

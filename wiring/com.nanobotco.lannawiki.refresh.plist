@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+	<key>Label</key>
+	<string>com.nanobotco.lannawiki.refresh</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/python3</string>
+		<string>/Users/annikapeacock/Developer/claude code projects/bot-tower/tower.py</string>
+		<string>run</string>
+		<string>lannawiki-publish</string>
+		<string>--patience</string>
+		<string>90</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/tmp/bottower-lannawiki-publish.log</string>
+	<key>StandardOutPath</key>
+	<string>/tmp/bottower-lannawiki-publish.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>3</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+</dict>
+</plist>

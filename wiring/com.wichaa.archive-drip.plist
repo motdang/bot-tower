@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.wichaa.archive-drip</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/annikapeacock/Developer/claude code projects/bot-tower/tower.py</string>
+        <string>run</string>
+        <string>wichaa-archive-drip</string>
+        <string>--patience</string>
+        <string>90</string>
+    </array>
+    <key>StartInterval</key><integer>10800</integer>
+    <key>StandardOutPath</key><string>/tmp/bottower-wichaa-archive-drip.log</string>
+    <key>StandardErrorPath</key><string>/tmp/bottower-wichaa-archive-drip.log</string>
+</dict>
+</plist>
